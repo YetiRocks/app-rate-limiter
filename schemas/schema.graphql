@@ -1,0 +1,32 @@
+# Rate Limiter — Sliding window abuse detection
+#
+# POST /app-rate-limiter/check — log request + evaluate conditions
+# GET  /app-rate-limiter/RequestLog — query logged requests
+#
+# Designed for CDN edge integration: response headers communicate the verdict.
+
+type RequestLog @table(expiration: 86400, database: "app-rate-limiter") @export(sse: true, mqtt: true, public: [read, subscribe]) {
+    id: ID! @primaryKey              # compound: subscriberId:timestamp
+    subscriberId: String! @indexed
+    sessionId: String @indexed
+    contentName: String @indexed
+    clientIp: String! @indexed
+    edgeIp: String
+    timestamp: String! @indexed
+    method: String
+    path: String
+    host: String
+    userAgent: String
+    country: String @indexed
+    metadata: String                 # JSON: arbitrary fields
+}
+
+type RateLimitConfig @table(database: "app-rate-limiter") @export {
+    id: ID! @primaryKey              # "default" or per-host config
+    windowSeconds: Int               # sliding window size (default 10)
+    maxRequests: Int                 # requests per subscriber+content (default 50)
+    maxIpCount: Int                  # unique IPs per subscriber+content (default 4)
+    maxContentViews: Int             # unique content per subscriber (default 4)
+    maxSessions: Int                 # sessions per subscriber+IP (default 1)
+    action: String                   # "flag", "block", "monitor" (default "flag")
+}

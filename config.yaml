@@ -1,0 +1,10 @@
+name: "Rate Limiter"
+app_id: "app-rate-limiter"
+version: "0.1.0"
+description: "Sliding window rate limiting with real-time piracy and abuse detection"
+
+schemas:
+  - schemas/schema.graphql
+
+resources:
+  - resources/*.rs
