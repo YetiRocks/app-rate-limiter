@@ -19,7 +19,7 @@ use yeti_sdk::prelude::*;
 //   4. multi_session    — >maxSessions unique sessions per subscriber+IP (default 1)
 resource!(Check {
     name = "check",
-    create(request, ctx) => {
+    post(request, ctx) => {
         let body: Value = request.json()?;
 
         let subscriber_id = body["subscriberId"].as_str()
