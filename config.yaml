@@ -1,5 +1,6 @@
 name: "Rate Limiter"
 app_id: "app-rate-limiter"
+customer_id: "yeti"
 version: "0.1.0"
 description: "Sliding window rate limiting with real-time piracy and abuse detection"
 
