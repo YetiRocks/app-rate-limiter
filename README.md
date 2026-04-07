@@ -48,7 +48,7 @@ Restart yeti. The application compiles automatically on first load (~2 minutes) 
 ### 2. Configure thresholds
 
 ```bash
-curl -X PUT https://localhost/app-rate-limiter/api/RateLimitConfig/default \
+curl -X PUT https://localhost:9996/app-rate-limiter/api/RateLimitConfig/default \
   -H "Content-Type: application/json" \
   -d '{
     "id": "default",
@@ -78,7 +78,7 @@ Response:
 ### 3. Send a request for evaluation
 
 ```bash
-curl -X POST https://localhost/app-rate-limiter/api/check \
+curl -X POST https://localhost:9996/app-rate-limiter/api/check \
   -H "Content-Type: application/json" \
   -d '{
     "subscriberId": "user-123",
@@ -120,7 +120,7 @@ Send the same request from multiple IPs to exceed the `maxIpCount` threshold (de
 
 ```bash
 for ip in 203.0.113.1 203.0.113.2 203.0.113.3 203.0.113.4 203.0.113.5; do
-  curl -s -X POST https://localhost/app-rate-limiter/api/check \
+  curl -s -X POST https://localhost:9996/app-rate-limiter/api/check \
     -H "Content-Type: application/json" \
     -d "{
       \"subscriberId\": \"user-123\",
@@ -148,7 +148,7 @@ The fifth request returns:
 
 ```bash
 # SSE stream -- see every request as it is logged
-curl --max-time 30 "https://localhost/app-rate-limiter/api/RequestLog?stream=sse"
+curl --max-time 30 "https://localhost:9996/app-rate-limiter/api/RequestLog?stream=sse"
 
 # MQTT -- subscribe to request log changes
 mosquitto_sub -t "app-rate-limiter/RequestLog" -h localhost -p 8883
@@ -369,7 +369,7 @@ Per-host or default threshold configuration. Authenticated access only.
 Create or update the default configuration:
 
 ```bash
-curl -X PUT https://localhost/app-rate-limiter/api/RateLimitConfig/default \
+curl -X PUT https://localhost:9996/app-rate-limiter/api/RateLimitConfig/default \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
