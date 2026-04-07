@@ -48,7 +48,7 @@ Restart yeti. The application compiles automatically on first load (~2 minutes) 
 ### 2. Configure thresholds
 
 ```bash
-curl -X PUT https://localhost:9996/app-rate-limiter/RateLimitConfig/default \
+curl -X PUT https://localhost/app-rate-limiter/api/RateLimitConfig/default \
   -H "Content-Type: application/json" \
   -d '{
     "id": "default",
@@ -78,7 +78,7 @@ Response:
 ### 3. Send a request for evaluation
 
 ```bash
-curl -X POST https://localhost:9996/app-rate-limiter/check \
+curl -X POST https://localhost/app-rate-limiter/api/check \
   -H "Content-Type: application/json" \
   -d '{
     "subscriberId": "user-123",
@@ -120,7 +120,7 @@ Send the same request from multiple IPs to exceed the `maxIpCount` threshold (de
 
 ```bash
 for ip in 203.0.113.1 203.0.113.2 203.0.113.3 203.0.113.4 203.0.113.5; do
-  curl -s -X POST https://localhost:9996/app-rate-limiter/check \
+  curl -s -X POST https://localhost/app-rate-limiter/api/check \
     -H "Content-Type: application/json" \
     -d "{
       \"subscriberId\": \"user-123\",
@@ -148,7 +148,7 @@ The fifth request returns:
 
 ```bash
 # SSE stream -- see every request as it is logged
-curl --max-time 30 "https://localhost:9996/app-rate-limiter/RequestLog?stream=sse"
+curl --max-time 30 "https://localhost/app-rate-limiter/api/RequestLog?stream=sse"
 
 # MQTT -- subscribe to request log changes
 mosquitto_sub -t "app-rate-limiter/RequestLog" -h localhost -p 8883
@@ -161,7 +161,7 @@ mosquitto_sub -t "app-rate-limiter/RequestLog" -h localhost -p 8883
 ```
 CDN Edge Worker (Cloudflare, Akamai, CloudFront)
     |
-    |  POST /app-rate-limiter/check
+    |  POST /app-rate-limiter/api/check
     |  { subscriberId, clientIp, sessionId, contentName, ... }
     |
     v
@@ -206,7 +206,7 @@ CDN Edge Worker enforces (block, flag, allow)
 
 ## Features
 
-### Request Check (POST /app-rate-limiter/check)
+### Request Check (POST /app-rate-limiter/api/check)
 
 Log a request and evaluate all rate-limiting conditions in a single call. This is the primary endpoint for CDN edge integration.
 
@@ -284,7 +284,7 @@ Real-time updates are built into the platform via `@export(sse: true, mqtt: true
 
 ```bash
 # SSE -- server-sent events for dashboards
-GET /app-rate-limiter/RequestLog?stream=sse
+GET /app-rate-limiter/api/RequestLog?stream=sse
 
 # MQTT -- subscribe to request log changes
 mosquitto_sub -t "app-rate-limiter/RequestLog" -h localhost -p 8883
@@ -298,10 +298,10 @@ Full CRUD on all tables is auto-generated from the schema:
 
 | Endpoint | Methods | Description |
 |----------|---------|-------------|
-| `/app-rate-limiter/RequestLog` | GET, POST | List/create request logs |
-| `/app-rate-limiter/RequestLog/{id}` | GET, PUT, DELETE | Read/update/delete a request log |
-| `/app-rate-limiter/RateLimitConfig` | GET, POST | List/create config entries |
-| `/app-rate-limiter/RateLimitConfig/{id}` | GET, PUT, DELETE | Read/update/delete a config entry |
+| `/app-rate-limiter/api/RequestLog` | GET, POST | List/create request logs |
+| `/app-rate-limiter/api/RequestLog/{id}` | GET, PUT, DELETE | Read/update/delete a request log |
+| `/app-rate-limiter/api/RateLimitConfig` | GET, POST | List/create config entries |
+| `/app-rate-limiter/api/RateLimitConfig/{id}` | GET, PUT, DELETE | Read/update/delete a config entry |
 
 Query parameters:
 
@@ -369,7 +369,7 @@ Per-host or default threshold configuration. Authenticated access only.
 Create or update the default configuration:
 
 ```bash
-curl -X PUT https://localhost:9996/app-rate-limiter/RateLimitConfig/default \
+curl -X PUT https://localhost/app-rate-limiter/api/RateLimitConfig/default \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
@@ -398,10 +398,11 @@ version: "0.1.0"
 description: "Sliding window rate limiting with real-time piracy and abuse detection"
 
 schemas:
-  - schemas/schema.graphql
+  path: schemas/schema.graphql
 
 resources:
-  - resources/*.rs
+  path: resources/*.rs
+  route: /api
 ```
 
 ### Project Structure
@@ -429,7 +430,7 @@ export default {
     const url = new URL(request.url);
 
     // Forward request metadata to rate limiter
-    const checkResponse = await fetch(`${env.YETI_ORIGIN}/app-rate-limiter/check`, {
+    const checkResponse = await fetch(`${env.YETI_ORIGIN}/app-rate-limiter/api/check`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -489,7 +490,7 @@ export async function onClientRequest(request) {
   const cookies = new Cookies(request.getHeader('Cookie'));
   const sessionId = cookies.get('session_id') || '';
 
-  const checkResponse = await httpRequest(`${YETI_ORIGIN}/app-rate-limiter/check`, {
+  const checkResponse = await httpRequest(`${YETI_ORIGIN}/app-rate-limiter/api/check`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
