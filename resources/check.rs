@@ -136,7 +136,6 @@ resource!(Check {
             .header("x-subscriber-flagged", if flagged { "True" } else { "False" })
             .header("x-subscriber-conditions", &conditions_str)
             .header("x-subscriber-action", if flagged { action } else { "allow" })
-            .code(200)
             .json(json!({
                 "subscriberId": subscriber_id,
                 "flagged": flagged,
