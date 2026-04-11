@@ -19,8 +19,8 @@ use yeti_sdk::prelude::*;
 //   4. multi_session    — >maxSessions unique sessions per subscriber+IP (default 1)
 resource!(Check {
     name = "check",
-    post(request, ctx) => {
-        let body: Value = request.json()?;
+    post(ctx) => {
+        let body: Value = ctx.require_json_body()?.clone();
 
         let subscriber_id = body["subscriberId"].as_str()
             .ok_or_else(|| YetiError::Validation("missing subscriberId".into()))?;
