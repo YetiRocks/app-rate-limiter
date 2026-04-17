@@ -9,4 +9,4 @@ schemas:
 
 resources:
   path: resources/*.rs
-  route: /api
+  root: /api
