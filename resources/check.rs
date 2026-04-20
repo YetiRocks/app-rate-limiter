@@ -32,8 +32,8 @@ resource!(Check {
         let now = unix_timestamp()?;
         let now_str = now.to_string();
 
-        let log_table = ctx.get_table("RequestLog")?;
-        let config_table = ctx.get_table("RateLimitConfig")?;
+        let log_table = ctx.table("RequestLog")?;
+        let config_table = ctx.table("RateLimitConfig")?;
 
         // Load config
         let config = config_table.get("default").await?.unwrap_or(json!({}));
