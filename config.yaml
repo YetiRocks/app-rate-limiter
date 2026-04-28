@@ -1,0 +1,12 @@
+name: "Rate Limiter"
+app_id: "app-rate-limiter"
+customer_id: "yeti"
+version: "0.1.0"
+description: "Rate Limiter"
+
+schemas:
+  path: schemas/schema.graphql
+
+resources:
+  path: "resources/*.rs"
+  root: /api
