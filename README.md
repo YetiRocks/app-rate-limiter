@@ -389,27 +389,35 @@ The `/check` endpoint reads the `"default"` config record on every call. Changes
 
 Store a config record keyed by hostname to override defaults for specific CDN origins. The current implementation reads the `"default"` key; extend the check resource to look up `host`-specific configs for multi-tenant deployments.
 
-### config.yaml
+### Cargo.toml ([package.metadata.app])
 
-```yaml
-name: "Rate Limiter"
-app_id: "app-rate-limiter"
-version: "0.1.0"
-description: "Sliding window rate limiting with real-time piracy and abuse detection"
+App configuration lives in `Cargo.toml` under `[package.metadata.app]`. There is no separate `config.yaml` or `services.yaml`:
 
-schemas:
-  path: schemas/schema.graphql
+```toml
+[package]
+name = "app-rate-limiter"
+version = "0.1.0"
+edition = "2024"
+description = "Sliding window rate limiting with real-time piracy and abuse detection"
 
-resources:
-  path: resources/*.rs
-  route: /api
+[package.metadata.app]
+schemas = "schemas/schema.graphql"
+resources = "resources/*.rs"
+```
+
+To require authentication on `/check` and config endpoints, add a `[package.metadata.auth]` block:
+
+```toml
+[package.metadata.auth]
+allow_signup = false
+default_role = "edge"
 ```
 
 ### Project Structure
 
 ```
 app-rate-limiter/
-  config.yaml              # App configuration
+  Cargo.toml               # App configuration ([package.metadata.app])
   schemas/
     schema.graphql         # RequestLog + RateLimitConfig tables
   resources/
@@ -572,7 +580,7 @@ app-rate-limiter uses yeti's built-in auth system. In development mode, all endp
 - **RequestLog** allows public `read` and `subscribe` access (configured via `@export(public: [read, subscribe])` in the schema). Monitoring dashboards can consume the SSE stream without credentials.
 - **RateLimitConfig** requires authentication for all operations. Only authorized users can change thresholds or enforcement actions.
 - **POST /check** requires authentication in production. CDN edge workers authenticate via a service account Bearer token or Basic Auth credentials.
-- **JWT** and **Basic Auth** are supported (configured in the app's config.yaml `auth:` section).
+- **JWT** and **Basic Auth** are supported (configured in the app's `Cargo.toml` under `[package.metadata.auth]`).
 - For multi-CDN deployments, use yeti-auth's role system to scope different CDN origins to different rate-limiting configurations.
 
 ---
