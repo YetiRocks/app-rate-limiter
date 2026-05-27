@@ -5,7 +5,7 @@
 #
 # Designed for CDN edge integration: response headers communicate the verdict.
 
-type RequestLog @table(expiration: 86400, database: "app-rate-limiter") @export(sse: true, mqtt: true, public: [read, subscribe]) {
+type RequestLog @table(database: "app-rate-limiter") @store(evictAfter: 86400) @export(sse: true, mqtt: true) @access(public: [read, subscribe]) {
     id: ID! @primaryKey              # compound: subscriberId:timestamp
     subscriberId: String! @indexed
     sessionId: String @indexed
