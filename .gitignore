@@ -8,3 +8,7 @@ target/
 /Cargo.lock
 /web/
 .DS_Store
+
+# Runtime output, not source (deployment mirror + build cache).
+/deployments/
+/cache/
