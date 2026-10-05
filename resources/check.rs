@@ -32,8 +32,12 @@ resource!(Check {
         let now = unix_timestamp()?;
         let now_str = now.to_string();
 
-        let log_table = ctx.table("RequestLog")?;
-        let config_table = ctx.table("RateLimitConfig")?;
+        // System handle (ADR-038, YTC-1905): the check is the app's own rate
+        // accounting, not a read or write on the caller's behalf. It counts a
+        // sliding window across every subscriber's log rows (an aggregate the
+        // caller may not read row by row) and appends the log entry itself.
+        let log_table = ctx.system().table("RequestLog")?;
+        let config_table = ctx.system().table("RateLimitConfig")?;
 
         // Load config
         let config = config_table.get("default").await?.unwrap_or(json!({}));
