@@ -298,9 +298,9 @@ Full CRUD on all tables is auto-generated from the schema:
 
 | Endpoint | Methods | Description |
 |----------|---------|-------------|
-| `/app-rate-limiter/api/RequestLog` | GET, POST | List/create request logs |
+| `/app-rate-limiter/api/RequestLog/` | GET, POST | List/create request logs |
 | `/app-rate-limiter/api/RequestLog/{id}` | GET, PUT, DELETE | Read/update/delete a request log |
-| `/app-rate-limiter/api/RateLimitConfig` | GET, POST | List/create config entries |
+| `/app-rate-limiter/api/RateLimitConfig/` | GET, POST | List/create config entries |
 | `/app-rate-limiter/api/RateLimitConfig/{id}` | GET, PUT, DELETE | Read/update/delete a config entry |
 
 Query parameters:
